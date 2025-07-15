@@ -1,7 +1,6 @@
 import type { BrowserSupport } from '@/types';
 
 /**
- * Browser-in WebRTC dəstəyini yoxlayır
  * @returns Browser support məlumatları
  */
 export const checkBrowserSupport = (): BrowserSupport => {
@@ -11,7 +10,6 @@ export const checkBrowserSupport = (): BrowserSupport => {
     mediaDevices: false
   };
 
-  // getUserMedia dəstəyini yoxlamaq
   if (navigator.mediaDevices?.getUserMedia) {
     support.getUserMedia = true;
     support.mediaDevices = true;
@@ -19,7 +17,6 @@ export const checkBrowserSupport = (): BrowserSupport => {
     support.getUserMedia = true;
   }
 
-  // WebRTC dəstəyini yoxlamaq
   if (typeof RTCPeerConnection !== 'undefined' || 
       typeof (window as any).webkitRTCPeerConnection !== 'undefined' || 
       typeof (window as any).mozRTCPeerConnection !== 'undefined') {
@@ -30,7 +27,6 @@ export const checkBrowserSupport = (): BrowserSupport => {
 };
 
 /**
- * Audio constraints yaradır
  * @param options - Audio tənzimləmələri
  * @returns MediaStreamConstraints
  */
@@ -50,7 +46,6 @@ export const createAudioConstraints = (options?: {
 };
 
 /**
- * Audio stream-in həqiqi statusunu yoxlayır
  * @param stream - MediaStream
  * @returns Stream aktiv statusu
  */
@@ -62,7 +57,6 @@ export const isStreamActive = (stream: MediaStream | null): boolean => {
 };
 
 /**
- * Audio track-ları log edir
  * @param stream - MediaStream
  */
 export const logAudioTracks = (stream: MediaStream): void => {
@@ -83,7 +77,6 @@ export const logAudioTracks = (stream: MediaStream): void => {
 };
 
 /**
- * Audio stream-i təmizləyir
  * @param stream - MediaStream
  */
 export const cleanupAudioStream = (stream: MediaStream | null): void => {
@@ -98,7 +91,6 @@ export const cleanupAudioStream = (stream: MediaStream | null): void => {
 };
 
 /**
- * Mikrofon icazəsi statusunu yoxlayır
  * @returns Promise<PermissionState>
  */
 export const checkMicrophonePermission = async (): Promise<PermissionState> => {
