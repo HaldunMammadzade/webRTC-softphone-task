@@ -1,8 +1,8 @@
 import type { BrowserSupport } from '@/types';
 
 /**
- 
- * @returns 
+ * Browser-in WebRTC dəstəyini yoxlayır
+ * @returns Browser support məlumatları
  */
 export const checkBrowserSupport = (): BrowserSupport => {
   const support: BrowserSupport = {
@@ -11,16 +11,18 @@ export const checkBrowserSupport = (): BrowserSupport => {
     mediaDevices: false
   };
 
-
-  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+  // getUserMedia dəstəyini yoxlamaq
+  if (navigator.mediaDevices?.getUserMedia) {
     support.getUserMedia = true;
     support.mediaDevices = true;
-  } else if (navigator.getUserMedia) {
+  } else if ('getUserMedia' in navigator) {
     support.getUserMedia = true;
   }
 
-
-  if (window.RTCPeerConnection || window.webkitRTCPeerConnection || window.mozRTCPeerConnection) {
+  // WebRTC dəstəyini yoxlamaq
+  if (typeof RTCPeerConnection !== 'undefined' || 
+      typeof (window as any).webkitRTCPeerConnection !== 'undefined' || 
+      typeof (window as any).mozRTCPeerConnection !== 'undefined') {
     support.webRTC = true;
   }
 
@@ -48,9 +50,9 @@ export const createAudioConstraints = (options?: {
 };
 
 /**
-
+ * Audio stream-in həqiqi statusunu yoxlayır
  * @param stream - MediaStream
- * @returns 
+ * @returns Stream aktiv statusu
  */
 export const isStreamActive = (stream: MediaStream | null): boolean => {
   if (!stream) return false;
@@ -60,13 +62,13 @@ export const isStreamActive = (stream: MediaStream | null): boolean => {
 };
 
 /**
-
+ * Audio track-ları log edir
  * @param stream - MediaStream
  */
 export const logAudioTracks = (stream: MediaStream): void => {
   const audioTracks = stream.getAudioTracks();
   
-
+  console.log('Audio track sayı:', audioTracks.length);
   
   audioTracks.forEach((track, index) => {
     console.log(`Track ${index + 1}:`, {
@@ -81,41 +83,33 @@ export const logAudioTracks = (stream: MediaStream): void => {
 };
 
 /**
- * @param 
+ * Audio stream-i təmizləyir
+ * @param stream - MediaStream
  */
 export const cleanupAudioStream = (stream: MediaStream | null): void => {
   if (!stream) return;
   
+  console.log('Audio stream təmizlənir...');
   
   stream.getTracks().forEach(track => {
     track.stop();
+    console.log(`Track dayandırıldı: ${track.kind} (${track.label})`);
   });
 };
 
 /**
+ * Mikrofon icazəsi statusunu yoxlayır
  * @returns Promise<PermissionState>
  */
 export const checkMicrophonePermission = async (): Promise<PermissionState> => {
   try {
-    const permission = await navigator.permissions.query({ name: 'microphone' as PermissionName });
-    return permission.state;
+    if ('permissions' in navigator && 'query' in navigator.permissions) {
+      const permission = await navigator.permissions.query({ name: 'microphone' as PermissionName });
+      return permission.state;
+    }
+    return 'prompt';
   } catch (error) {
     console.warn('Mikrofon icazəsi yoxlanıla bilmədi:', error);
     return 'prompt';
   }
 };
-
-declare global {
-  interface Window {
-    webkitRTCPeerConnection: typeof RTCPeerConnection;
-    mozRTCPeerConnection: typeof RTCPeerConnection;
-  }
-  
-  interface Navigator {
-    getUserMedia: (
-      constraints: MediaStreamConstraints,
-      successCallback: (stream: MediaStream) => void,
-      errorCallback: (error: Error) => void
-    ) => void;
-  }
-}
