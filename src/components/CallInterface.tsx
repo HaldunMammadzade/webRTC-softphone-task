@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import CallStatus from './CallStatus';
 import CallControls from './CallControls';
 import AudioPlayer from './AudioPlayer';
 import { useWebRTC } from '@/hooks/useWebRTC';
 import { useTimer } from '@/hooks/useTimer';
-// import { CallState } from '@/types';
+import { CallState } from '@/types';
 
 const CallInterface: React.FC = () => {
   const {
@@ -20,19 +20,32 @@ const CallInterface: React.FC = () => {
 
   const { time, isRunning, startTimer, stopTimer, resetTimer } = useTimer();
 
+  // Zəng vəziyyətinə görə timer-ı idarə et
+  useEffect(() => {
+    if (callState === CallState.ACTIVE && !isRunning) {
+      startTimer();
+    } else if (callState === CallState.ENDED || callState === CallState.IDLE) {
+      stopTimer();
+      if (callState === CallState.IDLE) {
+        resetTimer();
+      }
+    }
+  }, [callState, isRunning, startTimer, stopTimer, resetTimer]);
+
   const handleStartCall = async () => {
     try {
+      resetTimer(); // Yeni zəng başlamazdan əvvəl reset et
       await startCall();
-      startTimer();
     } catch (err) {
       console.error('Zəng başlatılarkən xəta:', err);
+      resetTimer(); // Error olsa da reset et
     }
   };
 
   const handleEndCall = () => {
     endCall();
     stopTimer();
-    resetTimer();
+    // Reset timer automatically handled by useEffect
   };
 
   const handleToggleMute = () => {

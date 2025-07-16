@@ -5,7 +5,7 @@ import { formatTime } from '@/utils/timeUtils';
 const CallStatus: React.FC<CallStatusProps> = ({ 
   callState, 
   duration, 
-//   isRunning 
+  isRunning 
 }) => {
   const getStatusText = (state: CallState): string => {
     switch (state) {
@@ -37,6 +37,10 @@ const CallStatus: React.FC<CallStatusProps> = ({
     }
   };
 
+  // Timer yalnız aktiv zəng zamanı və ya sonlandırıldıqdan sonra qısa müddətdə göstər
+  const shouldShowTimer = callState === CallState.ACTIVE || 
+                          (callState === CallState.ENDED && duration > 0);
+
   return (
     <div className="call-status">
       <div className="status-container">
@@ -46,7 +50,7 @@ const CallStatus: React.FC<CallStatusProps> = ({
           </span>
         </div>
         
-        {(callState === CallState.ACTIVE || callState === CallState.ENDED) && (
+        {shouldShowTimer && (
           <div className="duration-display">
             <span className="duration-label">Müddət: </span>
             <span className="duration-time">{formatTime(duration)}</span>

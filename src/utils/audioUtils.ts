@@ -62,7 +62,6 @@ export const isStreamActive = (stream: MediaStream | null): boolean => {
 export const logAudioTracks = (stream: MediaStream): void => {
   const audioTracks = stream.getAudioTracks();
   
-  console.log('Audio track sayı:', audioTracks.length);
   
   audioTracks.forEach((track, index) => {
     console.log(`Track ${index + 1}:`, {
@@ -81,8 +80,6 @@ export const logAudioTracks = (stream: MediaStream): void => {
  */
 export const cleanupAudioStream = (stream: MediaStream | null): void => {
   if (!stream) return;
-  
-  console.log('Audio stream təmizlənir...');
   
   stream.getTracks().forEach(track => {
     track.stop();

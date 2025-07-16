@@ -16,32 +16,36 @@ export const useWebRTC = (): UseWebRTCReturn => {
     setCallState(CallState.CONNECTING);
 
     try {
+     
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: true,
         video: false
       });
 
+     
       streamRef.current = stream;
       setAudioStream(stream);
       setCallState(CallState.ACTIVE);
       
-     
+      
       stream.getAudioTracks().forEach(track => {
         track.addEventListener('ended', () => {
           setCallState(CallState.ENDED);
         });
 
         track.addEventListener('mute', () => {
-          console.log('Audio track mute ');
+          console.log('Audio track mute oldu');
         });
 
         track.addEventListener('unmute', () => {
-          console.log('Audio track unmute');
+          console.log('Audio track unmute oldu');
         });
       });
 
+     
       
     } catch (err) {
+      console.error('Zəng başlatılarkən xəta:', err);
       
       let errorMessage = 'Naməlum xəta baş verdi';
       
@@ -74,10 +78,9 @@ export const useWebRTC = (): UseWebRTCReturn => {
   const endCall = useCallback(() => {
     
     if (streamRef.current) {
-      
       streamRef.current.getTracks().forEach(track => {
         track.stop();
-        
+        console.log('Track dayandırıldı:', track.kind);
       });
       
       streamRef.current = null;
@@ -88,11 +91,9 @@ export const useWebRTC = (): UseWebRTCReturn => {
     setIsMuted(false);
     setError(null);
     
-    
-    
     setTimeout(() => {
       setCallState(CallState.IDLE);
-    }, 2000);
+    }, 3000);
   }, []);
 
   const toggleMute = useCallback(() => {
@@ -105,6 +106,7 @@ export const useWebRTC = (): UseWebRTCReturn => {
       });
       
       setIsMuted(!isMuted);
+      console.log('Mute statusu dəyişdirildi:', !isMuted);
     }
   }, [isMuted]);
 
